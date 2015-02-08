@@ -1,0 +1,13 @@
+version: 0.0
+os: linux
+files:
+   - source: /
+     destination: /var/www/html/hubot
+permissions:
+   - object: /var/www/html/hubot
+     pattern: "**"
+     owner: apache
+     group: apache
+     mode: 755
+     type:
+       - file
