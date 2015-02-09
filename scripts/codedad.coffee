@@ -5,22 +5,60 @@
 #   None
 #
 # Commands:
-#   Codedad review Jira Name - adds a Ticket to the review queue
+#   codedad review Jira Name - adds a Ticket to the review queue
 
 #
 # Author:
-#   michael-hopkins
-review = "http://ec2-52-0-112-141.compute-1.amazonaws.com/reviews/test"
-quit = "http://url.com/cards/quit"
+#   patrick-cunningham
+devreview ="http://homestead.app/reviews/request"
+prodreview = "http://ec2-52-0-112-141.compute-1.amazonaws.com/reviews/test"
+devcomplete = "http://homestead.app/reviews/complete"
+devclaim = "http://homestead.app/reviews/claim"
+devlist = "http://homestead.app/reviews/list"
 choose = "http://url.com/cards/choose"
 show = "http://url.com/cards/show"
 
-module.exports = (codeDad) ->
 
-  codeDad.respond /review (.*)/i, (msg) ->
+module.exports = (codeDad) ->
+  codeDad.respond /list-reviews/i, (msg) ->
     user = msg.message.user.name
-    message = msg.message.text
-    room = msg.message.user.room
-    cardId = msg.match[1]
-    data = {'user_name': user,'message': message,'room': room,'directive': 1,'ticket': cardId}
-    codeDad.http(review).query(data).get() (err, res, body) ->
+    data = {
+      'user': user,
+    }
+    codeDad.http(devlist).query(data).get() (err, res, body) ->
+
+  codeDad.respond /claim-review (.*)/i, (msg) ->
+    user = msg.message.user.name
+    jira = msg.match[1]
+    data = {
+      'completion_user': user,
+      'jira_ticket': jira,
+    }
+    codeDad.http(devclaim).query(data).get() (err, res, body) ->
+
+
+  codeDad.respond /complete-review (.*) ("[^\"]*")/i, (msg) ->
+    user = msg.message.user.name
+    jira = msg.match[1]
+    comments = msg.match[2].replace(/["']/g, "")
+    data = {
+      'completion_time': Date.now(),
+      'completion_user': user,
+      'jira_ticket': jira,
+      'completion_comments': comments
+    }
+    codeDad.http(devcomplete).query(data).get() (err, res, body) ->
+
+  codeDad.respond /request-review (.*) (.*) ("[^\"]*")/i, (msg) ->
+    user = msg.message.user.name
+    jira = msg.match[1]
+    repo = msg.match[2]
+    comments = msg.match[3].replace(/["']/g, "")
+    data = {
+      'submitted': Date.now(),
+      'request_user': user,
+      'repo_link': repo,
+      'jira_ticket': jira,
+      'request_comments': comments
+    }
+    codeDad.http(devreview).query(data).get() (err, res, body) ->
