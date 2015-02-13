@@ -15,6 +15,7 @@ prodreview = "http://ec2-52-0-112-141.compute-1.amazonaws.com/reviews/test"
 devcomplete = "http://homestead.app/reviews/complete"
 devclaim = "http://homestead.app/reviews/claim"
 devlist = "http://homestead.app/reviews/list"
+devDrop = "http://homestead.app/reviews/drop"
 choose = "http://url.com/cards/choose"
 show = "http://url.com/cards/show"
 
@@ -93,4 +94,15 @@ module.exports = (codeDad) ->
       'request_comments': comments
     }
     msg.http(devreview).query(data).get() (err, res, body) ->
+      msg.send JSON.parse(body)
+
+  #Drop a ticket
+  codeDad.respond /drop-review (.*)/i, (msg) ->
+    user = msg.message.user.name
+    jira = msg.match[1]
+    data = {
+      'completion_user': user,
+      'jira_ticket': jira
+    }
+    msg.http(devDrop).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
