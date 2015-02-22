@@ -5,31 +5,43 @@
 #   None
 #
 # Commands:
-#   codedad list-review - Lists reviews
-
+#   codedad list-reviews - List all Code Reviews in flow.
+#   codedad request-review <JIRA-TICKET> <REPO-LINK> <COMMENTS> - Request a review
+#   codedad request-review <JIRA-TICKET> <REPO-LINK> - Request a review
+#   codedad claim-review <JIRA-TICKET> - Assign a Code Review to yourself
+#   codedad complete-review <JIRA-TICKET> <COMMENTS> - Complete a CodeReview
+#   codedad complete-review <JIRA-TICKET> - Complete a CodeReview
+#   codedad drop-review <JIRA-TICKET> - Unassign a CodeReiew from yourself
+#   codedad deploy-add <JIRA-TICKET> - Add a ticket to be deployed
+#   codedad deploy-staging <JIRA-TICKET> - Signal Staging Deployment - Code pushers only
+#   codedad deploy-production <JIRA-TICKET> - Signal Production Deployment - Code pushers only
+#   codedad validate-staging <JIRA-TICKET> - Signal that the ticket was reviewed in staging
+#   codedad validate-production <JIRA-TICKET> - Signal that the ticket was reviewed in production
+#   codedad list-deploys - List Deploys for the Day
 #
 # Author:
 #   patrick-cunningham
-devreview = "http://homestead.app/reviews/request"
-prodreview = "http://ec2-52-0-112-141.compute-1.amazonaws.com/reviews/test"
-devcomplete = "http://homestead.app/reviews/complete"
-devclaim = "http://homestead.app/reviews/claim"
-devlist = "http://homestead.app/reviews/list"
-devDrop = "http://homestead.app/reviews/drop"
-
-devDeployAdd = "http://homestead.app/deploy/request"
-devStage = "http://homestead.app/deploy/stage"
-devDeploy = "http://homestead.app/deploy/deploy"
-devValidStaging = "http://homestead.app/deploy/stagingValidate"
-devValidProduction = "http://homestead.app/deploy/validate"
-devDeployList = "http://homestead.app/deploy/list"
-choose = "http://url.com/cards/choose"
-show = "http://url.com/cards/show"
+dotenv = require('dotenv');
+dotenv.load();
+domain = process.env.DOMAIN
+review = domain+"/reviews/request"
+complete = domain+"/reviews/complete"
+claim = domain+"/reviews/claim"
+list = domain+"/reviews/list"
+Drop = domain+"/reviews/drop"
+DeployAdd = domain+"/deploy/request"
+Stage = domain+"/deploy/stage"
+Deploy = domain+"/deploy/deploy"
+ValidStaging = domain+"/deploy/stagingValidate"
+ValidProduction = domain+"/deploy/validate"
+DeployList = domain+"/deploy/list"
+blockDeploy = domain+"/deploy/block"
+unblockDeploy = domain+"/deploy/unblock"
 
 #List of reviews that are not completed
 module.exports = (codeDad) ->
   codeDad.respond /list-reviews/i, (msg) ->
-    msg.http(devlist)
+    msg.http(list)
     .get() (err, res, body) ->
       msg.send JSON.parse(body)
 
@@ -41,22 +53,8 @@ module.exports = (codeDad) ->
       'completion_user': user,
       'jira_ticket': jira,
     }
-    msg.http(devclaim).query(data).get() (err, res, body) ->
+    msg.http(claim).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
-
-
-  codeDad.respond /complete-review (.*) ("[^\"]*")/i, (msg) ->
-    user = msg.message.user.name
-    jira = msg.match[1]
-    comments = msg.match[2].replace(/["']/g, "")
-    data = {
-      'completion_time': Date.now(),
-      'completion_user': user,
-      'jira_ticket': jira,
-      'completion_comments': comments
-    }
-    msg.http(devcomplete).query(data).get() (err, res, body) ->
-      msg.send body
 
   codeDad.respond /complete-review (.*)/i, (msg) ->
     user = msg.message.user.name
@@ -65,42 +63,23 @@ module.exports = (codeDad) ->
     data = {
       'completion_time': Date.now(),
       'completion_user': user,
-      'jira_ticket': jira,
-      'completion_comments': comments
+      'jira_ticket': jira
     }
-    msg.http(devcomplete).query(data).get() (err, res, body) ->
+    msg.http(complete).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  #Request Code Review with comments
-  codeDad.respond /request-review (.*) (.*) ("[^\"]*")/i, (msg) ->
-    user = msg.message.user.name
-    jira = msg.match[1]
-    repo = msg.match[2]
-    comments = msg.match[3].replace(/["']/g, "")
-    data = {
-      'submitted': Date.now(),
-      'request_user': user,
-      'repo_link': repo,
-      'jira_ticket': jira,
-      'request_comments': comments
-    }
-    msg.http(devreview).query(data).get() (err, res, body) ->
-      msg.send JSON.parse(body)
 
-  #Request Code Review with no comments
   codeDad.respond /request-review (.*) (.*)/i, (msg) ->
     user = msg.message.user.name
     jira = msg.match[1]
     repo = msg.match[2]
-    comments = "No comment :("
     data = {
       'submitted': Date.now(),
       'request_user': user,
       'repo_link': repo,
-      'jira_ticket': jira,
-      'request_comments': comments
+      'jira_ticket': jira
     }
-    msg.http(devreview).query(data).get() (err, res, body) ->
+    msg.http(review).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
   #Drop a ticket
@@ -111,7 +90,7 @@ module.exports = (codeDad) ->
       'completion_user': user,
       'jira_ticket': jira
     }
-    msg.http(devDrop).query(data).get() (err, res, body) ->
+    msg.http(Drop).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /deploy-staging (.*)/i, (msg) ->
@@ -120,7 +99,7 @@ module.exports = (codeDad) ->
     data = {
       'jira_ticket': jira
     }
-    msg.http(devStage).query(data).get() (err, res, body) ->
+    msg.http(Stage).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
 
@@ -129,7 +108,7 @@ module.exports = (codeDad) ->
     data = {
       'jira_ticket': jira,
     }
-    msg.http(devValidStaging).query(data).get() (err, res, body) ->
+    msg.http(ValidStaging).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /deploy-production (.*)/i, (msg) ->
@@ -137,7 +116,7 @@ module.exports = (codeDad) ->
     data = {
       'jira_ticket': jira,
     }
-    msg.http(devDeploy).query(data).get() (err, res, body) ->
+    msg.http(Deploy).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
 
@@ -146,7 +125,7 @@ module.exports = (codeDad) ->
     data = {
       'jira_ticket': jira,
     }
-    msg.http(devValidProduction).query(data).get() (err, res, body) ->
+    msg.http(ValidProduction).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /deploy-add (.*)/i, (msg) ->
@@ -156,9 +135,27 @@ module.exports = (codeDad) ->
       'user': user,
       'jira_ticket': jira
     }
-    msg.http(devDeployAdd).query(data).get() (err, res, body) ->
+    msg.http(DeployAdd).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /list-deploys/i, (msg) ->
-    msg.http(devDeployList).get() (err, res, body) ->
+    msg.http(DeployList).get() (err, res, body) ->
+      msg.send JSON.parse(body)
+
+  codeDad.respond /block-deploy (.*) ("[^\"]*")/i, (msg) ->
+    jira = msg.match[1]
+    comment = msg.match[2].replace(/["']/g, "")
+    data = {
+      'jira_ticket': jira,
+      'block_comment': comment
+    }
+    msg.http(blockDeploy).query(data).get() (err, res, body) ->
+      msg.send JSON.parse(body)
+
+  codeDad.respond /unblock-deploy (.*)/i, (msg) ->
+    jira = msg.match[1]
+    data = {
+      'jira_ticket': jira
+    }
+    msg.http(unblockDeploy).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
