@@ -22,13 +22,9 @@
 # Author:
 #  patrick-cunningham
 # needs to be refactored hard  could refactor down to a few methods.
-dotenv = require('dotenv');
-dotenv.load();
-if process.env.ENVIROMENT == 'dev'
-  domain = "http://homestead.app"
-else
-  domain = "http://ec2-52-1-244-2.compute-1.amazonaws.com"
-
+dotenv = require('dotenv')
+dotenv.load()
+domain = process.env.DOMAIN
 review = domain+"/reviews/request"
 complete = domain+"/reviews/complete"
 claim = domain+"/reviews/claim"
