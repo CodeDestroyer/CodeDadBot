@@ -17,6 +17,8 @@
 #   codedad deploy-production <JIRA-TICKET> - Signal Production Deployment - Code pushers only
 #   codedad validate-staging <JIRA-TICKET> - Signal that the ticket was reviewed in staging
 #   codedad validate-production <JIRA-TICKET> - Signal that the ticket was reviewed in production
+#   codedad block-deploy <JIRA-TICKET> <"COMMENTS">
+#   codedad unblock-deploy <JIRA-TICKET>
 #   codedad list-deploys - List Deploys for the Day
 #
 # Author:
