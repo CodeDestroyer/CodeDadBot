@@ -20,10 +20,15 @@
 #   codedad list-deploys - List Deploys for the Day
 #
 # Author:
-#   patrick-cunningham
+#  patrick-cunningham
+# needs to be refactored hard  could refactor down to a few methods.
 dotenv = require('dotenv');
 dotenv.load();
-domain = process.env.DOMAIN
+if process.env.ENVIROMENT == 'dev'
+  domain = "http://homestead.app"
+else
+  domain = "http://ec2-52-1-244-2.compute-1.amazonaws.com"
+
 review = domain+"/reviews/request"
 complete = domain+"/reviews/complete"
 claim = domain+"/reviews/claim"
@@ -48,7 +53,7 @@ module.exports = (codeDad) ->
   #Claim a Review
   codeDad.respond /claim-review (.*)/i, (msg) ->
     user = msg.message.user.name
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     data = {
       'completion_user': user,
       'jira_ticket': jira,
@@ -58,7 +63,7 @@ module.exports = (codeDad) ->
 
   codeDad.respond /complete-review (.*)/i, (msg) ->
     user = msg.message.user.name
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     comments = "no comments:("
     data = {
       'completion_time': Date.now(),
@@ -71,7 +76,7 @@ module.exports = (codeDad) ->
 
   codeDad.respond /request-review (.*) (.*)/i, (msg) ->
     user = msg.message.user.name
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     repo = msg.match[2]
     data = {
       'submitted': Date.now(),
@@ -85,7 +90,7 @@ module.exports = (codeDad) ->
   #Drop a ticket
   codeDad.respond /drop-review (.*)/i, (msg) ->
     user = msg.message.user.name
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     data = {
       'completion_user': user,
       'jira_ticket': jira
@@ -94,8 +99,7 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /deploy-staging (.*)/i, (msg) ->
-    user = msg.message.user.name
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira
     }
@@ -104,7 +108,7 @@ module.exports = (codeDad) ->
 
 
   codeDad.respond /validate-staging (.*)/i, (msg) ->
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira,
     }
@@ -112,7 +116,7 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /deploy-production (.*)/i, (msg) ->
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira,
     }
@@ -121,7 +125,7 @@ module.exports = (codeDad) ->
 
 
   codeDad.respond /validate-production (.*)/i, (msg) ->
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira,
     }
@@ -130,7 +134,7 @@ module.exports = (codeDad) ->
 
   codeDad.respond /deploy-add (.*)/i, (msg) ->
     user = msg.message.user.name
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     data = {
       'user': user,
       'jira_ticket': jira
@@ -143,7 +147,7 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /block-deploy (.*) ("[^\"]*")/i, (msg) ->
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     comment = msg.match[2].replace(/["']/g, "")
     data = {
       'jira_ticket': jira,
@@ -153,7 +157,7 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /unblock-deploy (.*)/i, (msg) ->
-    jira = msg.match[1]
+    jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira
     }

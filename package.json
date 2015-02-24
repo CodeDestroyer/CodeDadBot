@@ -8,7 +8,8 @@
     "hubot": "^2.11.0",
     "hubot-rules": "^0.1.0",
     "hubot-slack": "^3.2.1",
-    "dotenv": "0.5.1"
+    "dotenv": "0.5.1",
+    "xml2js": "0.2.0"
   },
   "engines": {
     "node": "0.10.x"
