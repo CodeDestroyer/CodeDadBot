@@ -44,7 +44,10 @@ unblockDeploy = domain+"/deploy/unblock"
 #List of reviews that are not completed
 module.exports = (codeDad) ->
   codeDad.respond /list-reviews/i, (msg) ->
-    msg.http(list)
+    data = {
+      'verbose': false
+    }
+    msg.http(list).query(data)
     .get() (err, res, body) ->
       msg.send JSON.parse(body)
 
