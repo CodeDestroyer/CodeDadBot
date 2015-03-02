@@ -10,7 +10,7 @@
 #   codedad claim-review <JIRA-TICKET> - Assign a Code Review to yourself
 #   codedad complete-review <JIRA-TICKET> <COMMENTS> - Complete a code review
 #   codedad complete-review <JIRA-TICKET> - Complete a code review
-#   codedad list-reviews-verbose - List reviews with links
+#   codedad verbose-list-reviews - List reviews with links
 #   codedad review-details <JIRA-TICKET> - Get the details of a specific ticket.
 #   codedad drop-review <JIRA-Ticket> - drop an assigned code review
 #   codedad remove-review <JIRA-Ticket> - delete a code review
@@ -31,17 +31,17 @@ details = domain + "/reviews/details"
 remove = domain + "/reviews/dropTicket"
 
 module.exports = (codeDad) ->
-  codeDad.respond /list-reviews/i, (msg) ->
+  codeDad.respond /verbose-list-reviews/i, (msg) ->
     data = {
-      'verbose': false
+      'verbose': true
     }
     msg.http(list).query(data)
     .get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /list-reviews-verbose/i, (msg) ->
+  codeDad.respond /list-reviews/i, (msg) ->
     data = {
-      'verbose': true
+      'verbose': false
     }
     msg.http(list).query(data)
     .get() (err, res, body) ->
