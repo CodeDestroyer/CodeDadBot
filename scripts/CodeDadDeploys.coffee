@@ -13,6 +13,7 @@
 #   codedad validate-production <JIRA-TICKET> - Signal that the ticket was reviewed in production
 #   codedad block-deploy <JIRA-TICKET> <"COMMENTS">
 #   codedad unblock-deploy <JIRA-TICKET>
+#   codedad remove-deploy <JIRA-TICKET>
 #   codedad list-deploys - List Deploys for the Day
 
 #
@@ -24,48 +25,52 @@ dotenv.load()
 domain = process.env.DOMAIN
 
 DeployAdd = domain+"/deploy/request"
-Stage = domain+"/deploy/stage"
+toggle = domain+"/deploy/toggleStep"
 Deploy = domain+"/deploy/deploy"
 ValidStaging = domain+"/deploy/stagingValidate"
 ValidProduction = domain+"/deploy/validate"
 DeployList = domain+"/deploy/list"
 blockDeploy = domain+"/deploy/block"
 unblockDeploy = domain+"/deploy/unblock"
-
+deleteDeploy = domain+ "/deploy/delete"
 #List of reviews that are not completed
 module.exports = (codeDad) ->
   codeDad.respond /deploy-staging (.*)/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
+      'step': 'isStaged',
       'jira_ticket': jira
     }
-    msg.http(Stage).query(data).get() (err, res, body) ->
+    msg.http(toggle).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
 
   codeDad.respond /validate-staging (.*)/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
-      'jira_ticket': jira,
+      'step': 'isValidatedStaging',
+      'jira_ticket': jira
     }
-    msg.http(ValidStaging).query(data).get() (err, res, body) ->
+    msg.http(toggle).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /deploy-production (.*)/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
+      'step': 'isDeployed',
       'jira_ticket': jira,
     }
-    msg.http(Deploy).query(data).get() (err, res, body) ->
+    msg.http(toggle).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
 
   codeDad.respond /validate-production (.*)/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
-      'jira_ticket': jira,
+      'step':'isValidated',
+      'jira_ticket': jira
     }
-    msg.http(ValidProduction).query(data).get() (err, res, body) ->
+    msg.http(toggle).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
   codeDad.respond /deploy-add (.*)/i, (msg) ->
@@ -98,4 +103,12 @@ module.exports = (codeDad) ->
       'jira_ticket': jira
     }
     msg.http(unblockDeploy).query(data).get() (err, res, body) ->
+      msg.send JSON.parse(body)
+
+  codeDad.respond /remove-deployment (.*)/i, (msg) ->
+    jira = msg.match[1].toUpperCase()
+    data = {
+      'jira_ticket': jira
+    }
+    msg.http(deleteDeploy).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
