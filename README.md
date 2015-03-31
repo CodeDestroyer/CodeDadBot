@@ -7,9 +7,24 @@ This README is intended to help get you started. Definitely update and improve t
 [heroku]: http://www.heroku.com
 [hubot]: http://hubot.github.com
 [generator-hubot]: https://github.com/github/generator-hubot
-
+### Modifing
 ### Running CodeDad Locally
+You have to first run
+    % npm install
 
+to install all dependencies of the project, after which please edit this specific file.
+`node_modules/hubot-slack/src/slack.coffee`
+adding this before the class declaration.
+    dotenv = require('dotenv')
+    dotenv.load()
+
+This allows us to use `.env` files to hold configuration.  create a .env file in the root folder and here is a sample from mine
+    HUBOT_SLACK_TOKEN=TOKENSTUFF
+    DOMAIN=http://homestead.app
+    HUBOT_NEWRELIC_ACCOUNT_ID=307051
+    HUBOT_NEWRELIC_APP_ID=4775581
+    HUBOT_NEWRELIC_API_KEY=049cb2be5237d9248aeb6277f28056fed9238eac807ee6b
+    
 You can test your hubot by running the following.
 
 You can start CodeDad locally by running:
@@ -99,57 +114,7 @@ Where `<adapter>` is the name of your adapter without the `hubot-` prefix.
 
 [hubot-adapters]: https://github.com/github/hubot/blob/master/docs/adapters.md
 
-## Deployment
 
-    % heroku create --stack cedar
-    % git push heroku master
-
-If your Heroku account has been verified you can run the following to enable
-and add the Redis to Go addon to your app.
-
-    % heroku addons:add redistogo:nano
-
-If you run into any problems, checkout Heroku's [docs][heroku-node-docs].
-
-You'll need to edit the `Procfile` to set the name of your hubot.
-
-More detailed documentation can be found on the
-[deploying hubot onto Heroku][deploy-heroku] wiki page.
-
-### Deploying to UNIX or Windows
-
-If you would like to deploy to either a UNIX operating system or Windows.
-Please check out the [deploying hubot onto UNIX][deploy-unix] and
-[deploying hubot onto Windows][deploy-windows] wiki pages.
-
-[heroku-node-docs]: http://devcenter.heroku.com/articles/node-js
-[deploy-heroku]: https://github.com/github/hubot/blob/master/docs/deploying/heroku.md
-[deploy-unix]: https://github.com/github/hubot/blob/master/docs/deploying/unix.md
-[deploy-windows]: https://github.com/github/hubot/blob/master/docs/deploying/unix.md
-
-## Campfire Variables
-
-If you are using the Campfire adapter you will need to set some environment
-variables. Refer to the documentation for other adapters and the configuraiton
-of those, links to the adapters can be found on [Hubot Adapters][hubot-adapters].
-
-Create a separate Campfire user for your bot and get their token from the web
-UI.
-
-    % heroku config:add HUBOT_CAMPFIRE_TOKEN="..."
-
-Get the numeric IDs of the rooms you want the bot to join, comma delimited. If
-you want the bot to connect to `https://mysubdomain.campfirenow.com/room/42`
-and `https://mysubdomain.campfirenow.com/room/1024` then you'd add it like this:
-
-    % heroku config:add HUBOT_CAMPFIRE_ROOMS="42,1024"
-
-Add the subdomain hubot should connect to. If you web URL looks like
-`http://mysubdomain.campfirenow.com` then you'd add it like this:
-
-    % heroku config:add HUBOT_CAMPFIRE_ACCOUNT="mysubdomain"
-
-[hubot-adapters]: https://github.com/github/hubot/blob/master/docs/adapters.md
 
 ## Restart the bot
 
