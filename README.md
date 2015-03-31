@@ -10,21 +10,24 @@ This README is intended to help get you started. Definitely update and improve t
 ### Modifing
 ### Running CodeDad Locally
 You have to first run
+
     % npm install
 
 to install all dependencies of the project, after which please edit this specific file.
 `node_modules/hubot-slack/src/slack.coffee`
 adding this before the class declaration.
+
     dotenv = require('dotenv')
     dotenv.load()
 
 This allows us to use `.env` files to hold configuration.  create a .env file in the root folder and here is a sample from mine
+
     HUBOT_SLACK_TOKEN=TOKENSTUFF
     DOMAIN=http://homestead.app
     HUBOT_NEWRELIC_ACCOUNT_ID=307051
     HUBOT_NEWRELIC_APP_ID=4775581
     HUBOT_NEWRELIC_API_KEY=049cb2be5237d9248aeb6277f28056fed9238eac807ee6b
-    
+
 You can test your hubot by running the following.
 
 You can start CodeDad locally by running:
