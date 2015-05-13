@@ -14,6 +14,7 @@
 #   codedad review-details <JIRA-TICKET> - Get the details of a specific ticket.
 #   codedad drop-review <JIRA-Ticket> - drop an assigned code review
 #   codedad remove-review <JIRA-Ticket> - delete a code review
+#   codedad reopen-review <JIRA-TICKET> - reopens an existing review (sets the review back to request stage, unclaimed)
 #
 # Author:
 #  patrick-cunningham
@@ -29,6 +30,7 @@ list = domain + "/reviews/list"
 drop = domain + "/reviews/dropResponsibility"
 details = domain + "/reviews/details"
 remove = domain + "/reviews/dropTicket"
+reopen = domain + "/reviews/reopen"
 
 module.exports = (codeDad) ->
   codeDad.respond /verbose-list-reviews/i, (msg) ->
@@ -108,4 +110,15 @@ module.exports = (codeDad) ->
       'jira_ticket': jira
     }
     msg.http(remove).query(data).get() (err, res, body) ->
+      msg.send JSON.parse(body)
+
+  codeDad.respond /reopen-review (.*)/i, (msg) ->
+    user = msg.message.user.name
+    jira = msg.match[1].toUpperCase()
+    data = {
+      'submitted': Date.now(),
+      'request_user': user,
+      'jira_ticket': jira
+    }
+    msg.http(reopen).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
