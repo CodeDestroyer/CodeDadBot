@@ -25,5 +25,5 @@ itsworking = [
 ]
 
 module.exports = (robot) ->
-  robot.hear /it's|it’s|its working/i, (msg) ->
+  robot.hear /(it's|it’s|its) working/i, (msg) ->
     msg.send msg.random itsworking
