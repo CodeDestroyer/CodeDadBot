@@ -8,7 +8,7 @@
 #   None
 #
 # Commands:
-#   it's working - link to youtube videos
+#   it's working or its working - link to youtube videos
 #
 # Author:
 #   Dan Stark
@@ -25,5 +25,5 @@ itsworking = [
 ]
 
 module.exports = (robot) ->
-  robot.hear /it's working/i, (msg) ->
+  robot.hear /it's|it’s|its working/i, (msg) ->
     msg.send msg.random itsworking
