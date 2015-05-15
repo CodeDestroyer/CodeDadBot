@@ -5,10 +5,12 @@
   "author": "Patrick Cunningham <pcunningham@pet360.com>",
   "description": "A simple helpful robot for your Company",
   "dependencies": {
+    "dotenv": "0.5.1",
     "hubot": "^2.11.0",
+    "hubot-has-no-idea": "^1.2.0",
+    "hubot-motivate": "^3.0.0",
     "hubot-rules": "^0.1.0",
     "hubot-slack": "^3.2.1",
-    "dotenv": "0.5.1",
     "xml2js": "0.2.0"
   },
   "engines": {
