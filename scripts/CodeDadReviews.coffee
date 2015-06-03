@@ -6,7 +6,7 @@
 #
 # Commands:
 #   codedad list-reviews - List all Code Reviews in flow.
-#   codedad request-review <JIRA-TICKET> <REPO-LINK> - Request a review
+#   codedad request-review <JIRA-TICKET> <OPTIONAL-REPO-LINK> - Request a review
 #   codedad claim-review <JIRA-TICKET> - Assign a Code Review to yourself
 #   codedad complete-review <JIRA-TICKET> <COMMENTS> - Complete a code review
 #   codedad complete-review <JIRA-TICKET> - Complete a code review
@@ -72,10 +72,20 @@ module.exports = (codeDad) ->
     msg.http(complete).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /request-review (.*) (.*)/i, (msg) ->
+  codeDad.respond /request-review (.*)/i, (msg) ->
     user = msg.message.user.name
-    jira = msg.match[1].toUpperCase()
-    repo = msg.match[2]
+    query = msg.match[1]
+    rgxRepo = /^([a-zA-Z]+-[0-9]+) (.*)/
+    rgxNorepo = /^([a-zA-Z]+-[0-9]+)$/
+    if rgxRepo.test(query)
+      jira = query.match(rgxRepo)[1].toUpperCase()
+      repo = query.match(rgxRepo)[2]
+    else if rgxNorepo.test(query)
+      jira = query.match(rgxNorepo)[1].toUpperCase()
+      repo = ""
+    else
+      msg.send "Invalid arguments for request-review\n``` codedad request-review <JIRA-TICKET> <OPTIONAL-REPO-LINK> ``` "
+      return
     data = {
       'submitted': Date.now(),
       'request_user': user,
