@@ -33,7 +33,7 @@ remove = domain + "/reviews/dropTicket"
 reopen = domain + "/reviews/reopen"
 
 module.exports = (codeDad) ->
-  codeDad.respond /verbose-list-reviews/i, (msg) ->
+  codeDad.respond /verbose-list-reviews$/i, (msg) ->
     data = {
       'verbose': true
     }
@@ -41,7 +41,7 @@ module.exports = (codeDad) ->
     .get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /list-reviews/i, (msg) ->
+  codeDad.respond /list-reviews$/i, (msg) ->
     data = {
       'verbose': false
     }
@@ -50,9 +50,9 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
   #Claim a Review
-  codeDad.respond /claim-review (.*)/i, (msg) ->
+  codeDad.respond /claim-review ([a-z]+-[0-9]+)$/i, (msg) ->
     user = msg.message.user.name
-    jira = msg.match[1].toUpperCase()
+    jira = msg.match[1].toUpperCase().trim()
     data = {
       'completion_user': user,
       'jira_ticket': jira,
@@ -60,9 +60,9 @@ module.exports = (codeDad) ->
     msg.http(claim).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /complete-review (.*)/i, (msg) ->
+  codeDad.respond /complete-review ([a-z]+-[0-9]+)$/i, (msg) ->
     user = msg.message.user.name
-    jira = msg.match[1].toUpperCase()
+    jira = msg.match[1].toUpperCase().trim()
     comments = "no comments:("
     data = {
       'completion_time': Date.now(),
@@ -72,20 +72,16 @@ module.exports = (codeDad) ->
     msg.http(complete).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /request-review (.*)/i, (msg) ->
+  codeDad.respond /request-review ([a-z]+-[0-9]+)( .*)?/i, (msg) ->
     user = msg.message.user.name
-    query = msg.match[1]
-    rgxRepo = /^([a-zA-Z]+-[0-9]+) (.*)/
-    rgxNorepo = /^([a-zA-Z]+-[0-9]+)$/
-    if rgxRepo.test(query)
-      jira = query.match(rgxRepo)[1].toUpperCase()
-      repo = query.match(rgxRepo)[2]
-    else if rgxNorepo.test(query)
-      jira = query.match(rgxNorepo)[1].toUpperCase()
-      repo = ""
+    query = msg.match[1].toUpperCase().trim()
+    repoLink = msg.match[2]?.trim()
+    if repoLink?
+      jira = query
+      repo = repoLink
     else
-      msg.send "Invalid arguments for request-review\n``` codedad request-review <JIRA-TICKET> <OPTIONAL-REPO-LINK> ``` "
-      return
+      jira = query
+      repo = ""
     data = {
       'submitted': Date.now(),
       'request_user': user,
@@ -96,9 +92,9 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
 
-  codeDad.respond /drop-review (.*)/i, (msg) ->
+  codeDad.respond /drop-review ([a-z]+-[0-9]+)$/i, (msg) ->
     user = msg.message.user.name
-    jira = msg.match[1].toUpperCase()
+    jira = msg.match[1].toUpperCase().trim()
     data = {
       'completion_user': user,
       'jira_ticket': jira
@@ -106,7 +102,7 @@ module.exports = (codeDad) ->
     msg.http(drop).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /review-details (.*)/i, (msg) ->
+  codeDad.respond /review-details ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira
@@ -114,7 +110,7 @@ module.exports = (codeDad) ->
     msg.http(details).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /remove-review (.*)/i, (msg) ->
+  codeDad.respond /remove-review ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira
@@ -122,7 +118,7 @@ module.exports = (codeDad) ->
     msg.http(remove).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /reopen-review (.*)/i, (msg) ->
+  codeDad.respond /reopen-review ([a-z]+-[0-9]+)$/i, (msg) ->
     user = msg.message.user.name
     jira = msg.match[1].toUpperCase()
     data = {
