@@ -10,7 +10,6 @@
 #   codedad claim-review <JIRA-TICKET> - Assign a Code Review to yourself
 #   codedad complete-review <JIRA-TICKET> <COMMENTS> - Complete a code review
 #   codedad complete-review <JIRA-TICKET> - Complete a code review
-#   codedad verbose-list-reviews - List reviews with links
 #   codedad review-details <JIRA-TICKET> - Get the details of a specific ticket.
 #   codedad drop-review <JIRA-Ticket> - drop an assigned code review
 #   codedad remove-review <JIRA-Ticket> - delete a code review
