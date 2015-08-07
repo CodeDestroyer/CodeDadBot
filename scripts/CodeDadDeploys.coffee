@@ -34,7 +34,7 @@ unblockDeploy = domain+"/deploy/unblock"
 deleteDeploy = domain+ "/deploy/delete"
 #List of reviews that are not completed
 module.exports = (codeDad) ->
-  codeDad.respond /(?:deploy-staging|ds) ([a-z]+-[0-9]+)( .*)?$/i, (msg) ->
+  codeDad.respond /(?:deploy-staging|ds) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'step': 'isStaged',
@@ -44,7 +44,7 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
 
-  codeDad.respond /(?:validate-staging|vs) ([a-z]+-[0-9]+)( .*)?$/i, (msg) ->
+  codeDad.respond /(?:validate-staging|vs) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'step': 'isValidatedStaging',
@@ -53,7 +53,7 @@ module.exports = (codeDad) ->
     msg.http(toggle).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /(?:deploy-production|dp) ([a-z]+-[0-9]+)( .*)?$/i, (msg) ->
+  codeDad.respond /(?:deploy-production|dp) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'step': 'isDeployed',
@@ -63,7 +63,7 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
 
-  codeDad.respond /(?:validate-production|vp) ([a-z]+-[0-9]+)( .*)?$/i, (msg) ->
+  codeDad.respond /(?:validate-production|vp) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'step':'isValidated',
@@ -72,7 +72,7 @@ module.exports = (codeDad) ->
     msg.http(toggle).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /(?:deploy-add|da) ([a-z]+-[0-9]+)( .*)?$/i, (msg) ->
+  codeDad.respond /(?:deploy-add|da) ([a-z]+-[0-9]+)$/i, (msg) ->
     user = msg.message.user.name
     jira = msg.match[1].toUpperCase()
     data = {
@@ -96,7 +96,7 @@ module.exports = (codeDad) ->
     msg.http(blockDeploy).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /(?:unblock-deploy|ud) ([a-z]+-[0-9]+)( .*)?$/i, (msg) ->
+  codeDad.respond /(?:unblock-deploy|ud) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira
@@ -104,7 +104,7 @@ module.exports = (codeDad) ->
     msg.http(unblockDeploy).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /(?:remove-deploy|rm -d) ([a-z]+-[0-9]+)( .*)?$/i, (msg) ->
+  codeDad.respond /(?:remove-deploy|rm -d) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira
