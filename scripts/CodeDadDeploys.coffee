@@ -5,16 +5,15 @@
 #   None
 #
 # Commands:
-#   codedad drop-review <JIRA-TICKET> - Unassign a CodeReiew from yourself
-#   codedad deploy-add <JIRA-TICKET> - Add a ticket to be deployed
-#   codedad deploy-staging <JIRA-TICKET> - Signal Staging Deployment - Code pushers only
-#   codedad deploy-production <JIRA-TICKET> - Signal Production Deployment - Code pushers only
-#   codedad validate-staging <JIRA-TICKET> - Signal that the ticket was reviewed in staging
-#   codedad validate-production <JIRA-TICKET> - Signal that the ticket was reviewed in production
-#   codedad block-deploy <JIRA-TICKET> <"COMMENTS">
-#   codedad unblock-deploy <JIRA-TICKET>
-#   codedad remove-deploy <JIRA-TICKET>
-#   codedad list-deploys - List Deploys for the Day
+#   codedad deploy-add <JIRA-TICKET> - Add a ticket to be deployed (da)
+#   codedad deploy-staging <JIRA-TICKET> - Signal Staging Deployment - Code pushers only (ds)
+#   codedad deploy-production <JIRA-TICKET> - Signal Production Deployment - Code pushers only (dp)
+#   codedad validate-staging <JIRA-TICKET> - Signal that the ticket was reviewed in staging (vs)
+#   codedad validate-production <JIRA-TICKET> - Signal that the ticket was reviewed in production (vp)
+#   codedad block-deploy <JIRA-TICKET> <"COMMENTS"> (bd)
+#   codedad unblock-deploy <JIRA-TICKET> (ud)
+#   codedad remove-deploy <JIRA-TICKET> (rm -d)
+#   codedad list-deploys - List Deploys for the Day (ls -d)
 
 #
 # Author:
@@ -35,7 +34,7 @@ unblockDeploy = domain+"/deploy/unblock"
 deleteDeploy = domain+ "/deploy/delete"
 #List of reviews that are not completed
 module.exports = (codeDad) ->
-  codeDad.respond /deploy-staging (.*)/i, (msg) ->
+  codeDad.respond /(?:deploy-staging|ds) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'step': 'isStaged',
@@ -45,7 +44,7 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
 
-  codeDad.respond /validate-staging (.*)/i, (msg) ->
+  codeDad.respond /(?:validate-staging|vs) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'step': 'isValidatedStaging',
@@ -54,7 +53,7 @@ module.exports = (codeDad) ->
     msg.http(toggle).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /deploy-production (.*)/i, (msg) ->
+  codeDad.respond /(?:deploy-production|dp) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'step': 'isDeployed',
@@ -64,7 +63,7 @@ module.exports = (codeDad) ->
       msg.send JSON.parse(body)
 
 
-  codeDad.respond /validate-production (.*)/i, (msg) ->
+  codeDad.respond /(?:validate-production|vp) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'step':'isValidated',
@@ -73,7 +72,7 @@ module.exports = (codeDad) ->
     msg.http(toggle).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /deploy-add (.*)/i, (msg) ->
+  codeDad.respond /(?:deploy-add|da) ([a-z]+-[0-9]+)$/i, (msg) ->
     user = msg.message.user.name
     jira = msg.match[1].toUpperCase()
     data = {
@@ -83,11 +82,11 @@ module.exports = (codeDad) ->
     msg.http(DeployAdd).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /list-deploys/i, (msg) ->
+  codeDad.respond /list-deploys|ls -d/i, (msg) ->
     msg.http(DeployList).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /block-deploy (.*) ("[^\"]*")/i, (msg) ->
+  codeDad.respond /(?:block-deploy|bd) (.*) ("[^\"]*")/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     comment = msg.match[2].replace(/["']/g, "")
     data = {
@@ -97,7 +96,7 @@ module.exports = (codeDad) ->
     msg.http(blockDeploy).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /unblock-deploy (.*)/i, (msg) ->
+  codeDad.respond /(?:unblock-deploy|ud) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira
@@ -105,7 +104,7 @@ module.exports = (codeDad) ->
     msg.http(unblockDeploy).query(data).get() (err, res, body) ->
       msg.send JSON.parse(body)
 
-  codeDad.respond /remove-deployment (.*)/i, (msg) ->
+  codeDad.respond /(?:remove-deploy|rm -d) ([a-z]+-[0-9]+)$/i, (msg) ->
     jira = msg.match[1].toUpperCase()
     data = {
       'jira_ticket': jira

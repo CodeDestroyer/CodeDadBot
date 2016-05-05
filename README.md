@@ -32,7 +32,7 @@ You can test your hubot by running the following.
 
 You can start CodeDad locally by running:
 
-    % bin/hubot
+    % bin/hubot --adapter slack
 
 You'll see some start up output about where your scripts come from and a
 prompt:
